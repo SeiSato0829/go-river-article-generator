@@ -584,14 +584,23 @@
                 <p class="card-subtitle">記事と図解をダウンロード</p>
             </div>
             <div class="export-grid">
+                <div class="export-option" onclick="copyForNote()">
+                    <div class="export-icon" style="background: #10b981; color: white;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                        </svg>
+                    </div>
+                    <div class="export-title">note用コピー</div>
+                    <div class="export-desc">記事+図解位置マーカー</div>
+                </div>
                 <div class="export-option" onclick="copyToClipboard()">
                     <div class="export-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                         </svg>
                     </div>
-                    <div class="export-title">クリップボード</div>
-                    <div class="export-desc">note用にコピー</div>
+                    <div class="export-title">全てコピー</div>
+                    <div class="export-desc">記事+SVGコード含む</div>
                 </div>
                 <div class="export-option" onclick="exportMarkdown()">
                     <div class="export-icon">
@@ -933,17 +942,80 @@ SVGコード:`;
 
         function showExport() { showStep(5); }
 
+        function copyForNote() {
+            // note.com用：図解マーカーを挿入位置に変換
+            let noteContent = state.article;
+
+            if (state.diagrams.length > 0) {
+                const diagramMatches = state.article.match(/\*\*＞＞図解＜＜\*\*[\s\S]*?(?=\n\n|$)/g) || [];
+
+                diagramMatches.forEach((marker, index) => {
+                    const diagram = state.diagrams.find(d => d.index === index);
+                    if (diagram) {
+                        // マーカーを挿入位置指示に変換
+                        const replacement = `\n\n📊 **【ここに図解${index + 1}を挿入】**\n（下の「図解画像」からダウンロードした diagram-${index + 1}.svg をここにアップロード）\n`;
+                        noteContent = noteContent.replace(marker, replacement);
+                    }
+                });
+            }
+
+            navigator.clipboard.writeText(noteContent).then(() => {
+                showExportSuccess('note用にコピーしました（図解は別途ダウンロードしてください）');
+                // 図解がある場合は自動ダウンロードを促す
+                if (state.diagrams.length > 0) {
+                    setTimeout(() => {
+                        if (confirm(`図解が${state.diagrams.length}個あります。今すぐダウンロードしますか？`)) {
+                            downloadDiagrams();
+                        }
+                    }, 500);
+                }
+            });
+        }
+
         function copyToClipboard() {
-            navigator.clipboard.writeText(state.article).then(() => showExportSuccess('クリップボードにコピーしました'));
+            // 記事と図解を結合してコピー（SVGコード含む）
+            let fullContent = state.article;
+
+            // 図解マーカーを実際のSVGで置き換え
+            if (state.diagrams.length > 0) {
+                const diagramMatches = state.article.match(/\*\*＞＞図解＜＜\*\*[\s\S]*?(?=\n\n|$)/g) || [];
+
+                diagramMatches.forEach((marker, index) => {
+                    const diagram = state.diagrams.find(d => d.index === index);
+                    if (diagram) {
+                        // マーカーをSVGコードで置換
+                        const replacement = `${marker}\n\n<!-- 図解 ${index + 1} -->\n${diagram.svg}\n`;
+                        fullContent = fullContent.replace(marker, replacement);
+                    }
+                });
+
+                // 図解セクションを記事末尾にも追加（バックアップとして）
+                fullContent += '\n\n---\n\n## 図解一覧（SVGコード）\n\n';
+                state.diagrams.forEach((d, i) => {
+                    fullContent += `### 図解 ${d.index + 1}\n\n\`\`\`svg\n${d.svg}\n\`\`\`\n\n`;
+                });
+            }
+
+            navigator.clipboard.writeText(fullContent).then(() => showExportSuccess('記事とSVGコードをコピーしました'));
         }
 
         function exportMarkdown() {
-            const blob = new Blob([state.article], { type: 'text/markdown' });
+            // 図解SVGコード付きMarkdownを生成
+            let mdContent = state.article;
+
+            if (state.diagrams.length > 0) {
+                mdContent += '\n\n---\n\n## 図解一覧（SVGコード）\n\n';
+                state.diagrams.forEach((d) => {
+                    mdContent += `### 図解 ${d.index + 1}\n\n\`\`\`svg\n${d.svg}\n\`\`\`\n\n`;
+                });
+            }
+
+            const blob = new Blob([mdContent], { type: 'text/markdown' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = 'article.md';
             a.click();
-            showExportSuccess('Markdownをダウンロードしました');
+            showExportSuccess('Markdownをダウンロードしました（図解SVG含む）');
         }
 
         function downloadSingleDiagram(index) {
