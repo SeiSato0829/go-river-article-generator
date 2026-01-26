@@ -1,0 +1,19 @@
+[build]
+  command = "echo 'No build needed'"
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
+
+[dev]
+  port = 8888
+  targetPort = 3000
+  autoLaunch = false

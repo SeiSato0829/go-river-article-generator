@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go-River 記事生成システム</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .card-header .step {
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .card-header.completed .step {
+            background: var(--success);
+        }
+
+        /* API Keys Section */
+        .api-keys {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .api-key-input {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .api-key-input label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-600);
+        }
+
+        .api-key-input input {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .api-key-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 3px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .upload-area svg {
+            width: 48px;
+            height: 48px;
+            color: var(--gray-400);
+            margin-bottom: 1rem;
+        }
+
+        .upload-area p {
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-area .hint {
+            font-size: 0.875rem;
+            color: var(--gray-400);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .file-info svg {
+            width: 24px;
+            height: 24px;
+            color: var(--success);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-800);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--gray-200);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Progress */
+        .progress-container {
+            margin: 1.5rem 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #8b5cf6);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        /* Content Areas */
+        .content-area {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .content-area.editable {
+            background: white;
+            border: 2px solid var(--gray-200);
+            min-height: 300px;
+        }
+
+        .content-area:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Diagrams Grid */
+        .diagrams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .diagram-card {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .diagram-card h4 {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+        }
+
+        .diagram-preview {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .diagram-preview img, .diagram-preview svg {
+            max-width: 100%;
+            max-height: 180px;
+        }
+
+        .diagram-preview .placeholder {
+            color: var(--gray-400);
+            font-size: 0.875rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: var(--gray-100);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Status Messages */
+        .status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .status-info {
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        .status-success {
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .status-error {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .status-warning {
+            background: #fffbeb;
+            color: #92400e;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Export Section */
+        .export-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .export-option {
+            padding: 1.5rem;
+            background: var(--gray-50);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .export-option:hover {
+            background: white;
+            border-color: var(--primary);
+        }
+
+        .export-option svg {
+            width: 40px;
+            height: 40px;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .export-option h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .export-option p {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Go-River 記事生成システム</h1>
+            <p>音声ファイルから記事と図解を自動生成</p>
+        </header>
+
+        <!-- Step 0: API Keys -->
+        <div class="card" id="step0">
+            <div class="card-header">
+                <span class="step">0</span>
+                <h2>API設定</h2>
+            </div>
+            <div class="api-keys">
+                <div class="api-key-input">
+                    <label for="geminiKey">Gemini API Key（文字起こし用）</label>
+                    <input type="password" id="geminiKey" placeholder="AIzaSy...">
+                </div>
+                <div class="api-key-input">
+                    <label for="claudeKey">Claude API Key（記事・図解生成用）</label>
+                    <input type="password" id="claudeKey" placeholder="sk-ant-...">
+                </div>
+                <div class="api-key-input">
+                    <label for="replicateKey">Replicate API Key（画像生成用・任意）</label>
+                    <input type="password" id="replicateKey" placeholder="r8_...">
+                </div>
+            </div>
+            <p style="font-size: 0.875rem; color: var(--gray-600);">
+                ※ APIキーはブラウザに保存され、サーバーには送信されません（Netlify Functions経由で各APIに直接送信）
+            </p>
+            <button class="btn btn-primary" onclick="saveApiKeys()" style="margin-top: 1rem;">
+                保存して開始
+            </button>
+        </div>
+
+        <!-- Step 1: Upload -->
+        <div class="card hidden" id="step1">
+            <div class="card-header">
+                <span class="step">1</span>
+                <h2>音声ファイルをアップロード</h2>
+            </div>
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('audioFile').click()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <p>クリックまたはドラッグ＆ドロップ</p>
+                <p class="hint">対応形式: MP3, M4A, WAV, WebM, OGG</p>
+            </div>
+            <input type="file" id="audioFile" accept="audio/*" style="display:none" onchange="handleFileSelect(event)">
+            <div class="file-info hidden" id="fileInfo">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                    <strong id="fileName"></strong>
+                    <span id="fileSize" style="color: var(--gray-600); margin-left: 1rem;"></span>
+                </div>
+            </div>
+            <div class="btn-group" style="margin-top: 1.5rem;">
+                <button class="btn btn-primary" id="btnTranscribe" disabled onclick="startTranscription()">
+                    文字起こし開始
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Transcription -->
+        <div class="card hidden" id="step2">
+            <div class="card-header">
+                <span class="step">2</span>
+                <h2>文字起こし</h2>
+            </div>
+            <div class="progress-container hidden" id="transcriptionProgress">
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">
+                    <span>処理中...</span>
+                    <span id="transcriptionPercent">0%</span>
+                </div>
+            </div>
+            <div class="content-area" id="transcriptionResult"></div>
+            <div class="btn-group" style="margin-top: 1.5rem;">
+                <button class="btn btn-primary" id="btnGenerateArticle" disabled onclick="generateArticle()">
+                    記事を生成
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Article -->
+        <div class="card hidden" id="step3">
+            <div class="card-header">
+                <span class="step">3</span>
+                <h2>記事生成</h2>
+            </div>
+            <div class="progress-container hidden" id="articleProgress">
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">
+                    <span>Claude APIで記事を生成中...</span>
+                    <span id="articlePercent">0%</span>
+                </div>
+            </div>
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('preview')">プレビュー</button>
+                <button class="tab" onclick="switchTab('markdown')">Markdown</button>
+            </div>
+            <div id="articlePreview" class="content-area"></div>
+            <div id="articleMarkdown" class="content-area editable hidden" contenteditable="true"></div>
+            <div class="btn-group" style="margin-top: 1.5rem;">
+                <button class="btn btn-primary" id="btnGenerateDiagrams" disabled onclick="generateDiagrams()">
+                    図解を生成
+                </button>
+                <button class="btn btn-secondary" onclick="skipDiagrams()">
+                    図解をスキップ
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 4: Diagrams -->
+        <div class="card hidden" id="step4">
+            <div class="card-header">
+                <span class="step">4</span>
+                <h2>図解生成</h2>
+            </div>
+            <div class="status status-info hidden" id="diagramStatus">
+                <div class="spinner"></div>
+                <span>Claude APIでSVG図解を生成中...</span>
+            </div>
+            <div class="diagrams-grid" id="diagramsGrid"></div>
+            <div class="btn-group" style="margin-top: 1.5rem;">
+                <button class="btn btn-success" id="btnExport" disabled onclick="showExport()">
+                    エクスポート
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 5: Export -->
+        <div class="card hidden" id="step5">
+            <div class="card-header">
+                <span class="step">5</span>
+                <h2>エクスポート</h2>
+            </div>
+            <div class="export-options">
+                <div class="export-option" onclick="exportMarkdown()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h4>Markdown</h4>
+                    <p>記事をMD形式でダウンロード</p>
+                </div>
+                <div class="export-option" onclick="copyToClipboard()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                    </svg>
+                    <h4>クリップボード</h4>
+                    <p>記事をコピー（note用）</p>
+                </div>
+                <div class="export-option" onclick="downloadAll()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <h4>一括ダウンロード</h4>
+                    <p>記事+図解をZIPで</p>
+                </div>
+            </div>
+            <div class="status status-success hidden" id="exportStatus">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="exportMessage"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        // State
+        let state = {
+            audioFile: null,
+            audioBase64: null,
+            transcription: '',
+            article: '',
+            diagrams: [],
+            apiKeys: {
+                gemini: '',
+                claude: '',
+                replicate: ''
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved API keys
+            const savedKeys = localStorage.getItem('goriver-api-keys');
+            if (savedKeys) {
+                state.apiKeys = JSON.parse(savedKeys);
+                document.getElementById('geminiKey').value = state.apiKeys.gemini || '';
+                document.getElementById('claudeKey').value = state.apiKeys.claude || '';
+                document.getElementById('replicateKey').value = state.apiKeys.replicate || '';
+
+                if (state.apiKeys.gemini && state.apiKeys.claude) {
+                    showStep(1);
+                }
+            }
+
+            // Drag and drop
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+        });
+
+        function saveApiKeys() {
+            state.apiKeys.gemini = document.getElementById('geminiKey').value.trim();
+            state.apiKeys.claude = document.getElementById('claudeKey').value.trim();
+            state.apiKeys.replicate = document.getElementById('replicateKey').value.trim();
+
+            if (!state.apiKeys.gemini || !state.apiKeys.claude) {
+                alert('Gemini APIキーとClaude APIキーは必須です');
+                return;
+            }
+
+            localStorage.setItem('goriver-api-keys', JSON.stringify(state.apiKeys));
+            showStep(1);
+        }
+
+        function showStep(stepNum) {
+            for (let i = 0; i <= 5; i++) {
+                const step = document.getElementById(`step${i}`);
+                if (step) {
+                    if (i <= stepNum) {
+                        step.classList.remove('hidden');
+                    }
+                }
+            }
+        }
+
+        function handleFileSelect(event) {
+            if (event.target.files.length) {
+                handleFile(event.target.files[0]);
+            }
+        }
+
+        function handleFile(file) {
+            const validTypes = ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/webm', 'audio/ogg', 'audio/x-m4a'];
+            if (!validTypes.includes(file.type) && !file.name.match(/\.(mp3|m4a|wav|webm|ogg)$/i)) {
+                alert('対応していないファイル形式です');
+                return;
+            }
+
+            state.audioFile = file;
+
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            document.getElementById('fileInfo').classList.remove('hidden');
+            document.getElementById('btnTranscribe').disabled = false;
+
+            // Convert to base64
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                state.audioBase64 = e.target.result.split(',')[1];
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        async function startTranscription() {
+            showStep(2);
+            document.getElementById('btnTranscribe').disabled = true;
+            document.getElementById('transcriptionProgress').classList.remove('hidden');
+
+            const progressFill = document.querySelector('#transcriptionProgress .progress-bar-fill');
+            const progressText = document.getElementById('transcriptionPercent');
+
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress = Math.min(progress + Math.random() * 15, 90);
+                progressFill.style.width = progress + '%';
+                progressText.textContent = Math.round(progress) + '%';
+            }, 500);
+
+            try {
+                const response = await fetch('/.netlify/functions/transcribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        audio: state.audioBase64,
+                        mimeType: state.audioFile.type || 'audio/mp4',
+                        apiKey: state.apiKeys.gemini
+                    })
+                });
+
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                progressText.textContent = '100%';
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                state.transcription = data.transcription;
+                document.getElementById('transcriptionResult').textContent = state.transcription;
+                document.getElementById('btnGenerateArticle').disabled = false;
+
+                document.querySelector('#step2 .card-header').classList.add('completed');
+
+            } catch (error) {
+                clearInterval(progressInterval);
+                alert('文字起こしエラー: ' + error.message);
+                document.getElementById('btnTranscribe').disabled = false;
+            }
+        }
+
+        async function generateArticle() {
+            showStep(3);
+            document.getElementById('btnGenerateArticle').disabled = true;
+            document.getElementById('articleProgress').classList.remove('hidden');
+
+            const progressFill = document.querySelector('#articleProgress .progress-bar-fill');
+            const progressText = document.getElementById('articlePercent');
+
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress = Math.min(progress + Math.random() * 10, 90);
+                progressFill.style.width = progress + '%';
+                progressText.textContent = Math.round(progress) + '%';
+            }, 500);
+
+            try {
+                const response = await fetch('/.netlify/functions/article', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        transcription: state.transcription,
+                        apiKey: state.apiKeys.claude
+                    })
+                });
+
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                progressText.textContent = '100%';
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                state.article = data.article;
+                document.getElementById('articleMarkdown').textContent = state.article;
+                document.getElementById('articlePreview').innerHTML = marked.parse(state.article);
+                document.getElementById('btnGenerateDiagrams').disabled = false;
+
+                document.querySelector('#step3 .card-header').classList.add('completed');
+
+            } catch (error) {
+                clearInterval(progressInterval);
+                alert('記事生成エラー: ' + error.message);
+                document.getElementById('btnGenerateArticle').disabled = false;
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tab === 'preview') {
+                document.getElementById('articlePreview').classList.remove('hidden');
+                document.getElementById('articleMarkdown').classList.add('hidden');
+            } else {
+                document.getElementById('articlePreview').classList.add('hidden');
+                document.getElementById('articleMarkdown').classList.remove('hidden');
+            }
+        }
+
+        async function generateDiagrams() {
+            showStep(4);
+            document.getElementById('btnGenerateDiagrams').disabled = true;
+            document.getElementById('diagramStatus').classList.remove('hidden');
+
+            // Extract diagram markers from article
+            const diagramMatches = state.article.match(/\*\*＞＞図解＜＜\*\*[\s\S]*?(?=\n\n|$)/g) || [];
+
+            if (diagramMatches.length === 0) {
+                document.getElementById('diagramStatus').innerHTML = '<span>図解マーカーが見つかりませんでした</span>';
+                document.getElementById('btnExport').disabled = false;
+                return;
+            }
+
+            const grid = document.getElementById('diagramsGrid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < diagramMatches.length; i++) {
+                const diagramContent = diagramMatches[i];
+
+                // Create placeholder card
+                const card = document.createElement('div');
+                card.className = 'diagram-card';
+                card.innerHTML = `
+                    <h4>図解 ${i + 1}</h4>
+                    <div class="diagram-preview" id="diagram-${i}">
+                        <span class="placeholder">生成中...</span>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="downloadDiagram(${i})">ダウンロード</button>
+                `;
+                grid.appendChild(card);
+
+                try {
+                    const response = await fetch('/.netlify/functions/diagram', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            content: diagramContent,
+                            apiKey: state.apiKeys.claude
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.svg) {
+                        document.getElementById(`diagram-${i}`).innerHTML = data.svg;
+                        state.diagrams.push({ index: i, svg: data.svg, content: diagramContent });
+                    } else {
+                        document.getElementById(`diagram-${i}`).innerHTML = '<span class="placeholder">生成失敗</span>';
+                    }
+                } catch (error) {
+                    document.getElementById(`diagram-${i}`).innerHTML = '<span class="placeholder">エラー</span>';
+                }
+            }
+
+            document.getElementById('diagramStatus').classList.add('hidden');
+            document.getElementById('btnExport').disabled = false;
+            document.querySelector('#step4 .card-header').classList.add('completed');
+        }
+
+        function skipDiagrams() {
+            showStep(4);
+            showStep(5);
+            document.getElementById('step4').innerHTML = `
+                <div class="card-header completed">
+                    <span class="step">4</span>
+                    <h2>図解生成（スキップ）</h2>
+                </div>
+                <p style="color: var(--gray-600);">図解生成はスキップされました</p>
+            `;
+            document.getElementById('btnExport').disabled = false;
+        }
+
+        function showExport() {
+            showStep(5);
+        }
+
+        function exportMarkdown() {
+            const blob = new Blob([state.article], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'article.md';
+            a.click();
+            URL.revokeObjectURL(url);
+            showExportSuccess('Markdownファイルをダウンロードしました');
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(state.article).then(() => {
+                showExportSuccess('クリップボードにコピーしました');
+            });
+        }
+
+        function downloadDiagram(index) {
+            const diagram = state.diagrams.find(d => d.index === index);
+            if (diagram) {
+                const blob = new Blob([diagram.svg], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `diagram-${index + 1}.svg`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        async function downloadAll() {
+            // For simplicity, download article only (ZIP would require additional library)
+            exportMarkdown();
+
+            // Also download each diagram
+            state.diagrams.forEach((d, i) => {
+                setTimeout(() => downloadDiagram(i), i * 500);
+            });
+
+            showExportSuccess('すべてのファイルをダウンロード中...');
+        }
+
+        function showExportSuccess(message) {
+            const status = document.getElementById('exportStatus');
+            document.getElementById('exportMessage').textContent = message;
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 3000);
+        }
+    </script>
+</body>
+</html>
