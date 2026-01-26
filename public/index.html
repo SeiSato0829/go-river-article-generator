@@ -583,25 +583,33 @@
                 <h2 class="card-title">エクスポート</h2>
                 <p class="card-subtitle">記事と図解をダウンロード</p>
             </div>
-            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">note投稿の場合は「1. 記事をコピー」→「2. 図解をダウンロード」の順で進めてください</p>
             <div class="export-grid">
-                <div class="export-option" onclick="copyForNote()" style="border-color: #10b981; background: #f0fdf4;">
+                <div class="export-option" onclick="exportAsHTML()" style="border-color: #10b981; background: #f0fdf4;">
                     <div class="export-icon" style="background: #10b981; color: white;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </div>
+                    <div class="export-title">完全版DL</div>
+                    <div class="export-desc">記事+図解一体型HTML</div>
+                </div>
+                <div class="export-option" onclick="copyForNote()">
+                    <div class="export-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                         </svg>
                     </div>
-                    <div class="export-title">1. 記事をコピー</div>
-                    <div class="export-desc">note用（コードなし）</div>
+                    <div class="export-title">記事コピー</div>
+                    <div class="export-desc">note用テキスト</div>
                 </div>
-                <div class="export-option" onclick="downloadDiagramsAsPNG()" style="border-color: #2563eb; background: #eff6ff;">
-                    <div class="export-icon" style="background: #2563eb; color: white;">
+                <div class="export-option" onclick="downloadDiagramsAsPNG()">
+                    <div class="export-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <div class="export-title">2. 図解をDL</div>
-                    <div class="export-desc">PNG形式（note用）</div>
+                    <div class="export-title">図解PNG</div>
+                    <div class="export-desc">note用画像</div>
                 </div>
                 <div class="export-option" onclick="exportMarkdown()">
                     <div class="export-icon">
@@ -610,18 +618,10 @@
                         </svg>
                     </div>
                     <div class="export-title">Markdown</div>
-                    <div class="export-desc">.mdファイル保存</div>
-                </div>
-                <div class="export-option" onclick="downloadDiagrams()">
-                    <div class="export-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                        </svg>
-                    </div>
-                    <div class="export-title">SVG図解</div>
-                    <div class="export-desc">開発者向け</div>
+                    <div class="export-desc">.mdファイル</div>
                 </div>
             </div>
+            <p style="font-size: 0.8125rem; color: var(--text-muted); margin-top: 1rem;">「完全版DL」で記事と図解が一体化したHTMLファイルをダウンロードできます。ブラウザで開いて確認・印刷できます。</p>
             <div class="status-message status-success hidden" id="exportStatus">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1020,6 +1020,108 @@ SVGコード:`;
             a.download = 'article.md';
             a.click();
             showExportSuccess('Markdownをダウンロードしました（図解SVG含む）');
+        }
+
+        function exportAsHTML() {
+            // 記事と図解を一体化したHTMLファイルを生成
+            let articleContent = state.article;
+
+            // 図解マーカーをSVGで置換
+            if (state.diagrams.length > 0) {
+                const diagramPattern = /\*\*＞＞図解＜＜\*\*[\s\S]*?(?=\n\n|\n##|$)/g;
+                let diagramIndex = 0;
+
+                articleContent = articleContent.replace(diagramPattern, () => {
+                    const diagram = state.diagrams.find(d => d.index === diagramIndex);
+                    diagramIndex++;
+                    if (diagram) {
+                        return `\n\n<div class="diagram-container">${diagram.svg}</div>\n\n`;
+                    }
+                    return '';
+                });
+            }
+
+            // MarkdownをHTMLに変換
+            const articleHTML = marked.parse(articleContent);
+
+            // 完全なHTMLドキュメントを生成
+            const fullHTML = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go-River 記事</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f5f5f5;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        h1 { font-size: 1.75rem; margin-bottom: 1.5rem; color: #1a1a2e; border-bottom: 3px solid #0066FF; padding-bottom: 0.5rem; }
+        h2 { font-size: 1.35rem; margin: 2rem 0 1rem; color: #0066FF; }
+        h3 { font-size: 1.15rem; margin: 1.5rem 0 0.75rem; color: #333; }
+        p { margin-bottom: 1rem; }
+        strong { color: #0066FF; }
+        ul, ol { margin: 1rem 0 1rem 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+        hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
+        a { color: #0066FF; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .diagram-container {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+        .diagram-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #0066FF;
+            text-align: center;
+            color: #666;
+            font-size: 0.875rem;
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; padding: 2rem; }
+            .diagram-container { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        ${articleHTML}
+        <div class="footer">
+            <p>Generated by Go-River Article System</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+            const blob = new Blob([fullHTML], { type: 'text/html;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'go-river-article.html';
+            a.click();
+            showExportSuccess('記事+図解一体型HTMLをダウンロードしました');
         }
 
         function downloadSingleDiagram(index) {
