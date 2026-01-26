@@ -1,4 +1,4 @@
-// 図解SVG生成API - Gemini使用（統一版）
+// 図解SVG生成API - Gemini使用（改善版）
 export async function handler(event) {
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -26,25 +26,27 @@ export async function handler(event) {
       };
     }
 
-    const prompt = `以下の図解内容をSVGコードで作成してください。
+    const prompt = `あなたはSVG図解の専門家です。以下の内容をSVGで図解してください。
 
-## SVG作成ルール
-1. 幅800px、高さ500px程度のSVGを作成
-2. 日本語テキストを正確に表示（font-family: 'Noto Sans JP', sans-serif）
-3. プロフェッショナルな配色（青系: #2563eb, #3b82f6、緑系: #10b981、グレー系: #6b7280）
-4. 角丸の四角形、矢印、アイコン風の図形を使用
-5. 読みやすいフォントサイズ（タイトル: 24px、本文: 16px）
-6. 背景は白または薄いグラデーション
-
-## 重要
-- SVGコードのみを出力してください（説明文は不要）
-- <svg>タグから始めて</svg>タグで終わること
-- 文字が見切れないよう余白を確保すること
-
-## 図解内容
+【図解内容】
 ${content}
 
-SVGコードのみを出力してください：`;
+【SVG作成ルール】
+- サイズ: width="800" height="450"
+- フォント: Noto Sans JP（font-family="Noto Sans JP, sans-serif"）
+- 色: 青=#2563eb、緑=#10b981、グレー=#6b7280、白=#ffffff
+- 背景: 薄いグレー(#f8fafc)の角丸四角形
+- タイトル: 中央上部、24px、太字
+- 内容: カード形式で整理して表示
+- カード: 白背景、角丸8px、影効果（filter）
+
+【重要】
+- マークダウンのコードブロック(\`\`\`)は絶対に使わないでください
+- <svg>タグから直接始めて</svg>で終わってください
+- 日本語テキストをそのまま含めてください
+- 説明文は不要、SVGコードのみ出力
+
+SVGコード:`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
@@ -54,8 +56,8 @@ SVGコードのみを出力してください：`;
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.5,
-            maxOutputTokens: 4096
+            temperature: 0.3,
+            maxOutputTokens: 8192
           }
         })
       }
@@ -69,10 +71,20 @@ SVGコードのみを出力してください：`;
 
     let svg = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
 
-    // SVGタグのみを抽出
-    const svgMatch = svg.match(/<svg[\s\S]*?<\/svg>/i);
+    // コードブロックを除去（念のため）
+    svg = svg.replace(/```svg\s*/gi, '');
+    svg = svg.replace(/```\s*/gi, '');
+    svg = svg.trim();
+
+    // SVGタグを抽出
+    const svgMatch = svg.match(/<svg[\s\S]*<\/svg>/i);
     if (svgMatch) {
       svg = svgMatch[0];
+    }
+
+    // SVGが有効かチェック
+    if (!svg.includes('<svg') || !svg.includes('</svg>')) {
+      throw new Error('有効なSVGが生成されませんでした');
     }
 
     return {
