@@ -1,6 +1,5 @@
-// 記事生成API - Claude使用
+// 記事生成API - Gemini使用（統一版）
 export async function handler(event) {
-  // CORS
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -27,9 +26,7 @@ export async function handler(event) {
       };
     }
 
-    const systemPrompt = `あなたはプロの記事ライターです。対談音声の文字起こしから、読みやすく臨場感のあるnote記事を作成してください。`;
-
-    const userPrompt = `以下の文字起こしをもとに、noteの記事を執筆してください。
+    const prompt = `以下の文字起こしをもとに、noteの記事を執筆してください。
 
 ## 記事の方針
 - 読者が楽しく読めるよう、わかりやすくて臨場感のある記事にしてください
@@ -69,30 +66,28 @@ https://go-river.co.jp/
 
 ${transcription}`;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 8192,
-        messages: [
-          { role: 'user', content: userPrompt }
-        ],
-        system: systemPrompt
-      })
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 8192
+          }
+        })
+      }
+    );
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Claude API error');
+      throw new Error(data.error?.message || 'Gemini API error');
     }
 
-    const article = data.content?.[0]?.text || '';
+    const article = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
 
     return {
       statusCode: 200,

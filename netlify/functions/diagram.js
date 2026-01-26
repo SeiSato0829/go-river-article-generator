@@ -1,6 +1,5 @@
-// 図解SVG生成API - Claude使用
+// 図解SVG生成API - Gemini使用（統一版）
 export async function handler(event) {
-  // CORS
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -27,7 +26,7 @@ export async function handler(event) {
       };
     }
 
-    const systemPrompt = `あなたはSVG図解の専門家です。ビジネス記事用の図解をSVGコードで作成してください。
+    const prompt = `以下の図解内容をSVGコードで作成してください。
 
 ## SVG作成ルール
 1. 幅800px、高さ500px程度のSVGを作成
@@ -40,38 +39,35 @@ export async function handler(event) {
 ## 重要
 - SVGコードのみを出力してください（説明文は不要）
 - <svg>タグから始めて</svg>タグで終わること
-- 文字が見切れないよう余白を確保すること`;
+- 文字が見切れないよう余白を確保すること
 
-    const userPrompt = `以下の図解内容をSVGで作成してください：
-
+## 図解内容
 ${content}
 
 SVGコードのみを出力してください：`;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
-        messages: [
-          { role: 'user', content: userPrompt }
-        ],
-        system: systemPrompt
-      })
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.5,
+            maxOutputTokens: 4096
+          }
+        })
+      }
+    );
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Claude API error');
+      throw new Error(data.error?.message || 'Gemini API error');
     }
 
-    let svg = data.content?.[0]?.text || '';
+    let svg = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
 
     // SVGタグのみを抽出
     const svgMatch = svg.match(/<svg[\s\S]*?<\/svg>/i);
