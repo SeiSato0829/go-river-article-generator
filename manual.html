@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go-River 記事生成システム - ユーザーマニュアル</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066FF;
+            --primary-light: #E8F1FF;
+            --primary-dark: #0052CC;
+            --accent: #00C48C;
+            --accent-light: #E6F9F4;
+            --text-primary: #1A1A2E;
+            --text-secondary: #4A5568;
+            --text-muted: #718096;
+            --bg-primary: #FAFBFC;
+            --bg-card: #FFFFFF;
+            --border: #E2E8F0;
+            --gradient-primary: linear-gradient(135deg, #0066FF 0%, #00C48C 100%);
+            --gradient-dark: linear-gradient(135deg, #1A1A2E 0%, #2D3748 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+            --shadow-lg: 0 12px 48px rgba(0,0,0,0.12);
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient-dark);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.25rem;
+            border-radius: 100px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .hero h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Navigation */
+        .nav {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav a:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-primary);
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 1.0625rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .card-highlight {
+            border-left: 4px solid var(--primary);
+            background: var(--primary-light);
+        }
+
+        .card-accent {
+            border-left: 4px solid var(--accent);
+            background: var(--accent-light);
+        }
+
+        .card h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .card p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Steps */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .step {
+            display: flex;
+            gap: 1.5rem;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .step:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .step-content h4 {
+            font-size: 1.0625rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            margin: 0;
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+        }
+
+        .feature-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Export Options */
+        .export-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .export-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            border: 2px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .export-item.primary {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .export-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            color: var(--primary);
+        }
+
+        .export-item.primary .export-icon {
+            background: var(--accent);
+            color: white;
+        }
+
+        .export-item h5 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .export-item p {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #1E293B;
+            color: #E2E8F0;
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        /* Tips */
+        .tip {
+            display: flex;
+            gap: 1rem;
+            background: #FFF7ED;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 4px solid #F59E0B;
+            margin: 1.5rem 0;
+        }
+
+        .tip-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            color: #F59E0B;
+        }
+
+        .tip-content h5 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #92400E;
+            margin-bottom: 0.25rem;
+        }
+
+        .tip-content p {
+            font-size: 0.875rem;
+            color: #B45309;
+            margin: 0;
+        }
+
+        /* URL Box */
+        .url-box {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--bg-card);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .url-box .url {
+            flex: 1;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9375rem;
+            color: var(--primary);
+            word-break: break-all;
+        }
+
+        .url-box .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* FAQ */
+        .faq-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .faq-item h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .faq-item h4::before {
+            content: 'Q';
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .faq-item p {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            padding-left: 2.25rem;
+            margin: 0;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--gradient-dark);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            font-size: 0.9375rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.0625rem;
+            }
+
+            .section h2 {
+                font-size: 1.5rem;
+            }
+
+            .step {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main {
+                padding: 2rem 1rem;
+            }
+        }
+
+        /* Print */
+        @media print {
+            .nav {
+                display: none;
+            }
+
+            .hero {
+                padding: 2rem;
+                color: black;
+                background: none;
+            }
+
+            .hero::before {
+                display: none;
+            }
+
+            .section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <header class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">User Manual v1.0</span>
+            <h1>Go-River 記事生成システム</h1>
+            <p class="hero-subtitle">音声から記事・図解・アイキャッチ画像を自動生成する、AI搭載の記事作成プラットフォーム</p>
+            <div class="hero-meta">
+                <span>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    2026年1月
+                </span>
+                <span>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    合同会社Go-River
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="#overview">概要</a>
+            <a href="#setup">初期設定</a>
+            <a href="#usage">使い方</a>
+            <a href="#export">エクスポート</a>
+            <a href="#faq">FAQ</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Overview -->
+        <section class="section" id="overview">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2>システム概要</h2>
+                <p class="section-desc">Go-River記事生成システムでできること</p>
+            </div>
+
+            <div class="card card-highlight">
+                <h3>このシステムについて</h3>
+                <p>Go-River記事生成システムは、対談音声をアップロードするだけで、AI（Gemini）が自動的に文字起こし・記事執筆・図解生成・アイキャッチ画像作成を行う、オールインワンの記事作成プラットフォームです。</p>
+                <p>note.comへの投稿に最適化されており、プロフェッショナルな記事を短時間で作成できます。</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                    </div>
+                    <h4>AI文字起こし</h4>
+                    <p>話者を自動分離して高精度な文字起こし</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <h4>記事自動生成</h4>
+                    <p>Go-River向けフォーマットで記事を執筆</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
+                    </div>
+                    <h4>図解SVG生成</h4>
+                    <p>記事内容に合わせた図解を自動作成</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <h4>アイキャッチ生成</h4>
+                    <p>AI画像生成でnote用ヘッダーを作成</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Setup -->
+        <section class="section" id="setup">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2>初期設定</h2>
+                <p class="section-desc">使用開始前の準備</p>
+            </div>
+
+            <div class="card">
+                <h3>必要なもの</h3>
+                <p>このシステムを利用するには、以下のものが必要です。</p>
+                <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                    <li><strong>Gemini APIキー</strong> - Google AI Studioで無料取得可能</li>
+                    <li><strong>対談音声ファイル</strong> - MP3, M4A, WAV, WebM形式に対応</li>
+                    <li><strong>Webブラウザ</strong> - Chrome, Safari, Firefox, Edge（最新版推奨）</li>
+                </ul>
+            </div>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Google AI Studioにアクセス</h4>
+                        <p>以下のURLにアクセスし、Googleアカウントでログインしてください。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>APIキーを取得</h4>
+                        <p>「Get API key」→「Create API key」をクリックして、APIキーを取得します。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>APIキーを保存</h4>
+                        <p>生成されたAPIキー（AIzaSy...で始まる文字列）をコピーして安全な場所に保存してください。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="url-box">
+                <div>
+                    <div class="label">Google AI Studio</div>
+                    <div class="url">https://aistudio.google.com/</div>
+                </div>
+            </div>
+
+            <div class="tip">
+                <svg class="tip-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <div class="tip-content">
+                    <h5>APIキーの取り扱い注意</h5>
+                    <p>APIキーは他人と共有しないでください。本システムではAPIキーはブラウザ内にのみ保存され、外部に送信されることはありません。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Usage -->
+        <section class="section" id="usage">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2>使い方</h2>
+                <p class="section-desc">ステップバイステップガイド</p>
+            </div>
+
+            <div class="url-box">
+                <div>
+                    <div class="label">システムURL</div>
+                    <div class="url">https://celebrated-lebkuchen-3f45b4.netlify.app</div>
+                </div>
+            </div>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>APIキーを入力</h4>
+                        <p>システムにアクセスし、取得したGemini APIキーを入力して「設定を保存して開始」をクリックします。一度設定すると、次回以降は自動的に読み込まれます。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>音声ファイルをアップロード</h4>
+                        <p>対談音声ファイルをドラッグ＆ドロップ、またはクリックして選択します。対応形式：MP3, M4A, WAV, WebM, OGG</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>文字起こしを実行</h4>
+                        <p>「文字起こしを開始」をクリックすると、AIが音声を解析します。行川さん・竹田さんの話者分離も自動で行われます。（所要時間：1-2分）</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>記事を生成</h4>
+                        <p>「記事を生成」をクリックすると、文字起こし内容をもとにnote向けの記事が自動生成されます。プレビューで内容を確認できます。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>図解・アイキャッチを生成</h4>
+                        <p>「図解を生成」をクリックすると、記事内の図解マーカー位置に図解SVGが自動生成されます。続いてアイキャッチ画像も自動生成されます。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>エクスポート</h4>
+                        <p>「エクスポートへ進む」をクリックして、記事・図解・アイキャッチをダウンロードまたはコピーします。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Export -->
+        <section class="section" id="export">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2>エクスポートオプション</h2>
+                <p class="section-desc">用途に合わせた出力形式</p>
+            </div>
+
+            <div class="export-grid">
+                <div class="export-item primary">
+                    <div class="export-icon">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    </div>
+                    <h5>完全版DL</h5>
+                    <p>記事+図解+アイキャッチ一体型HTML</p>
+                </div>
+                <div class="export-item">
+                    <div class="export-icon">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <h5>アイキャッチ</h5>
+                    <p>note用ヘッダー画像（PNG）</p>
+                </div>
+                <div class="export-item">
+                    <div class="export-icon">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                    </div>
+                    <h5>記事コピー</h5>
+                    <p>note用テキスト（クリップボード）</p>
+                </div>
+                <div class="export-item">
+                    <div class="export-icon">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
+                    </div>
+                    <h5>図解PNG</h5>
+                    <p>note用図解画像ファイル</p>
+                </div>
+            </div>
+
+            <div class="card card-accent" style="margin-top: 1.5rem;">
+                <h3>note投稿の推奨フロー</h3>
+                <ol style="margin-left: 1.5rem; color: var(--text-secondary);">
+                    <li><strong>「アイキャッチ」</strong>をダウンロード → noteの「見出し画像」に設定</li>
+                    <li><strong>「記事コピー」</strong>をクリック → noteエディタに貼り付け</li>
+                    <li><strong>「図解PNG」</strong>をダウンロード → 記事内の【図解1】などの位置に挿入</li>
+                    <li>内容を確認・微調整して公開</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="section" id="faq">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <h2>よくある質問</h2>
+                <p class="section-desc">トラブルシューティング</p>
+            </div>
+
+            <div class="faq-item">
+                <h4>APIキーが無効と表示される</h4>
+                <p>Google AI Studioで正しいAPIキーを取得したか確認してください。APIキーは「AIzaSy」で始まる文字列です。コピー時に余計なスペースが入っていないか確認してください。</p>
+            </div>
+
+            <div class="faq-item">
+                <h4>文字起こしに時間がかかる</h4>
+                <p>音声ファイルのサイズによっては1-2分程度かかる場合があります。ブラウザを閉じずにお待ちください。長時間（5分以上）かかる場合は、ページを再読み込みしてやり直してください。</p>
+            </div>
+
+            <div class="faq-item">
+                <h4>図解が生成されない</h4>
+                <p>記事内に「**＞＞図解＜＜**」マーカーが含まれていることを確認してください。記事生成時に自動的に挿入されますが、手動で追加することも可能です。</p>
+            </div>
+
+            <div class="faq-item">
+                <h4>アイキャッチ画像の生成に失敗する</h4>
+                <p>Gemini 2.0 Flash Image Generationは現在実験的機能のため、まれに生成に失敗する場合があります。その場合は、再度「図解を生成」ボタンを押してお試しください。</p>
+            </div>
+
+            <div class="faq-item">
+                <h4>ダウンロードしたHTMLで画像が表示されない</h4>
+                <p>HTMLファイルには画像がBase64形式で埋め込まれているため、通常は問題なく表示されます。ブラウザのキャッシュをクリアするか、別のブラウザでお試しください。</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-logo">
+            <div class="footer-logo-icon">
+                <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <span>Go-River 記事生成システム</span>
+        </div>
+        <p>合同会社Go-River</p>
+        <p><a href="https://go-river.co.jp/" target="_blank">https://go-river.co.jp/</a></p>
+        <p style="margin-top: 1rem; opacity: 0.6; font-size: 0.8125rem;">© 2026 Go-River LLC. All rights reserved.</p>
+    </footer>
+</body>
+</html>
