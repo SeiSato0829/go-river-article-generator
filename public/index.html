@@ -448,7 +448,7 @@
             <div class="step-connector" id="connector1"></div>
             <div class="step-item" id="stepIndicator1">
                 <span class="step-number">2</span>
-                <span class="step-label">音声アップロード</span>
+                <span class="step-label">音声</span>
             </div>
             <div class="step-connector" id="connector2"></div>
             <div class="step-item" id="stepIndicator2">
@@ -458,11 +458,16 @@
             <div class="step-connector" id="connector3"></div>
             <div class="step-item" id="stepIndicator3">
                 <span class="step-number">4</span>
-                <span class="step-label">記事生成</span>
+                <span class="step-label">記事</span>
             </div>
             <div class="step-connector" id="connector4"></div>
             <div class="step-item" id="stepIndicator4">
                 <span class="step-number">5</span>
+                <span class="step-label">図解・画像</span>
+            </div>
+            <div class="step-connector" id="connector5"></div>
+            <div class="step-item" id="stepIndicator5">
+                <span class="step-number">6</span>
                 <span class="step-label">エクスポート</span>
             </div>
         </div>
@@ -561,17 +566,31 @@
             </div>
         </div>
 
-        <!-- Step 4: Diagrams -->
+        <!-- Step 4: Diagrams & Eyecatch -->
         <div class="card hidden" id="step4">
             <div class="card-header">
-                <h2 class="card-title">図解生成</h2>
-                <p class="card-subtitle">記事内の図解をSVGで自動生成</p>
+                <h2 class="card-title">図解・アイキャッチ生成</h2>
+                <p class="card-subtitle">記事内の図解とアイキャッチ画像を自動生成</p>
             </div>
             <div class="status-message status-info hidden" id="diagramStatus">
                 <div class="spinner"></div>
-                <span>図解を生成しています...</span>
+                <span id="diagramStatusText">図解を生成しています...</span>
             </div>
+
+            <!-- 図解セクション -->
+            <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-secondary);">図解</h3>
             <div class="diagrams-grid" id="diagramsGrid"></div>
+
+            <!-- アイキャッチセクション -->
+            <h3 style="font-size: 1rem; margin: 2rem 0 1rem; color: var(--text-secondary);">アイキャッチ画像</h3>
+            <div class="diagram-card" id="eyecatchCard">
+                <div class="diagram-label">note用アイキャッチ（1280x670px）</div>
+                <div class="diagram-preview" id="eyecatchPreview" style="min-height: 200px;">
+                    <span class="placeholder-text">図解生成後に自動生成されます</span>
+                </div>
+                <button class="btn btn-secondary" style="width:100%;margin-top:0.5rem" onclick="downloadEyecatch()" id="btnDownloadEyecatch" disabled>アイキャッチをダウンロード</button>
+            </div>
+
             <div class="btn-group" style="margin-top: 1.5rem;">
                 <button class="btn btn-success" id="btnExport" disabled onclick="showExport()">エクスポートへ進む</button>
             </div>
@@ -591,7 +610,16 @@
                         </svg>
                     </div>
                     <div class="export-title">完全版DL</div>
-                    <div class="export-desc">記事+図解一体型HTML</div>
+                    <div class="export-desc">記事+図解+アイキャッチ</div>
+                </div>
+                <div class="export-option" onclick="downloadEyecatch()">
+                    <div class="export-icon" style="background: #FF6B35; color: white;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div class="export-title">アイキャッチ</div>
+                    <div class="export-desc">note用ヘッダー画像</div>
                 </div>
                 <div class="export-option" onclick="copyForNote()">
                     <div class="export-icon">
@@ -605,23 +633,14 @@
                 <div class="export-option" onclick="downloadDiagramsAsPNG()">
                     <div class="export-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
                         </svg>
                     </div>
                     <div class="export-title">図解PNG</div>
-                    <div class="export-desc">note用画像</div>
-                </div>
-                <div class="export-option" onclick="exportMarkdown()">
-                    <div class="export-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                    </div>
-                    <div class="export-title">Markdown</div>
-                    <div class="export-desc">.mdファイル</div>
+                    <div class="export-desc">note用図解画像</div>
                 </div>
             </div>
-            <p style="font-size: 0.8125rem; color: var(--text-muted); margin-top: 1rem;">「完全版DL」で記事と図解が一体化したHTMLファイルをダウンロードできます。ブラウザで開いて確認・印刷できます。</p>
+            <p style="font-size: 0.8125rem; color: var(--text-muted); margin-top: 1rem;">「完全版DL」で記事・図解・アイキャッチが一体化したHTMLファイルをダウンロードできます。</p>
             <div class="status-message status-success hidden" id="exportStatus">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -643,6 +662,7 @@
             transcription: '',
             article: '',
             diagrams: [],
+            eyecatch: null, // { base64, mimeType }
             apiKey: ''
         };
 
@@ -685,18 +705,20 @@
         }
 
         function showStep(stepNum) {
-            for (let i = 0; i <= 5; i++) {
+            for (let i = 0; i <= 6; i++) {
                 const step = document.getElementById(`step${i}`);
                 if (step && i <= stepNum) step.classList.remove('hidden');
             }
         }
 
         function updateStepIndicator(current) {
-            for (let i = 0; i <= 4; i++) {
+            for (let i = 0; i <= 5; i++) {
                 const indicator = document.getElementById(`stepIndicator${i}`);
                 const connector = document.getElementById(`connector${i + 1}`);
-                indicator.classList.toggle('completed', i < current);
-                indicator.classList.toggle('active', i === current);
+                if (indicator) {
+                    indicator.classList.toggle('completed', i < current);
+                    indicator.classList.toggle('active', i === current);
+                }
                 if (connector) connector.classList.toggle('active', i < current);
             }
         }
@@ -931,7 +953,103 @@ SVGコード:`;
             }
 
             document.getElementById('diagramStatus').classList.add('hidden');
+
+            // 図解生成完了後、アイキャッチを生成
+            await generateEyecatch();
+
             document.getElementById('btnExport').disabled = false;
+        }
+
+        async function generateEyecatch() {
+            const statusEl = document.getElementById('diagramStatus');
+            const statusTextEl = document.getElementById('diagramStatusText');
+            const previewEl = document.getElementById('eyecatchPreview');
+
+            statusEl.classList.remove('hidden');
+            statusTextEl.textContent = 'アイキャッチ画像を生成しています...';
+            previewEl.innerHTML = '<div class="spinner"></div>';
+
+            try {
+                // 記事からタイトルとテーマを抽出
+                const titleMatch = state.article.match(/^#\s+(.+)$/m) || state.article.match(/^##\s+(.+)$/m);
+                const title = titleMatch ? titleMatch[1] : '即レスの重要性';
+
+                // 記事の最初の200文字を要約として使用
+                const summary = state.article.substring(0, 300).replace(/[#*\n]/g, ' ').trim();
+
+                const prompt = `Create a professional, modern eyecatch image for a business article.
+
+Theme: "${title}"
+Context: ${summary}
+
+Design requirements:
+- Clean, minimalist corporate design
+- Gradient background using blue (#0066FF) and teal (#00C48C)
+- Abstract geometric shapes or subtle patterns
+- Professional business atmosphere
+- NO text, NO letters, NO words in the image
+- Suitable for note.com article header
+- Modern, sophisticated aesthetic
+- High contrast and visually striking
+
+The image should evoke professionalism, innovation, and trust - perfect for a marketing/business consulting company.`;
+
+                // Gemini 2.0 Flash Image Generation API
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${state.apiKey}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: {
+                                responseModalities: ["image", "text"]
+                            }
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error?.message || 'Image generation failed');
+                }
+
+                const data = await response.json();
+
+                // 画像データを抽出
+                const parts = data.candidates?.[0]?.content?.parts || [];
+                const imagePart = parts.find(p => p.inlineData);
+
+                if (imagePart && imagePart.inlineData) {
+                    state.eyecatch = {
+                        base64: imagePart.inlineData.data,
+                        mimeType: imagePart.inlineData.mimeType || 'image/png'
+                    };
+
+                    // プレビュー表示
+                    previewEl.innerHTML = `<img src="data:${state.eyecatch.mimeType};base64,${state.eyecatch.base64}" style="max-width:100%; max-height:300px; border-radius:8px;">`;
+                    document.getElementById('btnDownloadEyecatch').disabled = false;
+                } else {
+                    throw new Error('画像が生成されませんでした');
+                }
+
+            } catch (error) {
+                console.error('Eyecatch generation error:', error);
+                previewEl.innerHTML = `<span class="placeholder-text">生成失敗: ${error.message}</span>`;
+                // エラーでもエクスポートは可能にする
+            }
+
+            statusEl.classList.add('hidden');
+        }
+
+        function downloadEyecatch() {
+            if (!state.eyecatch) return;
+
+            const link = document.createElement('a');
+            link.href = `data:${state.eyecatch.mimeType};base64,${state.eyecatch.base64}`;
+            link.download = 'eyecatch.png';
+            link.click();
+            showExportSuccess('アイキャッチをダウンロードしました');
         }
 
         function skipToExport() {
@@ -1059,6 +1177,14 @@ SVGコード:`;
                 );
             });
 
+            // アイキャッチ画像のHTML
+            let eyecatchHTML = '';
+            if (state.eyecatch) {
+                eyecatchHTML = `<div class="eyecatch">
+                    <img src="data:${state.eyecatch.mimeType};base64,${state.eyecatch.base64}" alt="アイキャッチ画像">
+                </div>`;
+            }
+
             // 完全なHTMLドキュメントを生成
             const fullHTML = `<!DOCTYPE html>
 <html lang="ja">
@@ -1083,6 +1209,16 @@ SVGコード:`;
             padding: 3rem;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .eyecatch {
+            margin: -3rem -3rem 2rem -3rem;
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
+        }
+        .eyecatch img {
+            width: 100%;
+            height: auto;
+            display: block;
         }
         h1 { font-size: 1.75rem; margin-bottom: 1.5rem; color: #1a1a2e; border-bottom: 3px solid #0066FF; padding-bottom: 0.5rem; }
         h2 { font-size: 1.35rem; margin: 2rem 0 1rem; color: #0066FF; }
@@ -1117,12 +1253,14 @@ SVGコード:`;
         @media print {
             body { background: white; padding: 0; }
             .container { box-shadow: none; padding: 2rem; }
+            .eyecatch { margin: -2rem -2rem 2rem -2rem; }
             .diagram-container { break-inside: avoid; }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        ${eyecatchHTML}
         ${articleHTML}
         <div class="footer">
             <p>Generated by Go-River Article System</p>
