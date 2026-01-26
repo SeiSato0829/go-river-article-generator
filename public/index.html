@@ -29,11 +29,7 @@
             --radius-lg: 16px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -43,7 +39,6 @@
             min-height: 100vh;
         }
 
-        /* Header */
         .header {
             background: var(--bg-card);
             border-bottom: 1px solid var(--border);
@@ -81,13 +76,6 @@
             justify-content: center;
             color: white;
             font-weight: 700;
-            font-size: 1rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
         }
 
         .api-status {
@@ -114,14 +102,12 @@
             background: currentColor;
         }
 
-        /* Main Layout */
         .main {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
         }
 
-        /* Progress Steps */
         .progress-steps {
             display: flex;
             align-items: center;
@@ -132,6 +118,7 @@
             background: var(--bg-card);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-sm);
+            flex-wrap: wrap;
         }
 
         .step-item {
@@ -154,41 +141,27 @@
             transition: all 0.3s ease;
         }
 
-        .step-item.active .step-number {
-            background: var(--primary);
-            color: white;
-        }
-
-        .step-item.completed .step-number {
-            background: var(--success);
-            color: white;
-        }
+        .step-item.active .step-number { background: var(--primary); color: white; }
+        .step-item.completed .step-number { background: var(--success); color: white; }
 
         .step-label {
             font-size: 0.875rem;
             font-weight: 500;
             color: var(--text-muted);
-            transition: all 0.3s ease;
         }
 
         .step-item.active .step-label,
-        .step-item.completed .step-label {
-            color: var(--text-primary);
-        }
+        .step-item.completed .step-label { color: var(--text-primary); }
 
         .step-connector {
             width: 60px;
             height: 2px;
             background: var(--border);
             margin: 0 0.5rem;
-            transition: all 0.3s ease;
         }
 
-        .step-connector.active {
-            background: var(--success);
-        }
+        .step-connector.active { background: var(--success); }
 
-        /* Cards */
         .card {
             background: var(--bg-card);
             border-radius: var(--radius-lg);
@@ -196,47 +169,15 @@
             padding: 2rem;
             margin-bottom: 1.5rem;
             border: 1px solid var(--border);
-            transition: all 0.3s ease;
         }
 
-        .card:hover {
-            box-shadow: var(--shadow-lg);
-        }
+        .card-header { margin-bottom: 1.5rem; }
+        .card-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .card-subtitle { font-size: 0.875rem; color: var(--text-secondary); }
 
-        .card-header {
-            margin-bottom: 1.5rem;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .card-subtitle {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .form-hint {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 0.375rem;
-        }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; }
+        .form-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.375rem; }
 
         .form-input {
             width: 100%;
@@ -244,8 +185,6 @@
             border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
             font-size: 0.9375rem;
-            color: var(--text-primary);
-            background: var(--bg-card);
             transition: all 0.2s ease;
         }
 
@@ -255,11 +194,6 @@
             box-shadow: 0 0 0 3px var(--primary-light);
         }
 
-        .form-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -274,49 +208,13 @@
             transition: all 0.2s ease;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-secondary { background: var(--bg-primary); color: var(--text-primary); border: 1.5px solid var(--border); }
+        .btn-success { background: var(--success); color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 
-        .btn-primary:hover:not(:disabled) {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
-        }
-
-        .btn-secondary {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            border: 1.5px solid var(--border);
-        }
-
-        .btn-secondary:hover:not(:disabled) {
-            background: var(--border);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-success:hover:not(:disabled) {
-            background: #00A676;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        /* Upload Area */
         .upload-area {
             border: 2px dashed var(--border);
             border-radius: var(--radius-md);
@@ -327,8 +225,7 @@
             background: var(--bg-primary);
         }
 
-        .upload-area:hover,
-        .upload-area.dragover {
+        .upload-area:hover, .upload-area.dragover {
             border-color: var(--primary);
             background: var(--primary-light);
         }
@@ -344,25 +241,10 @@
             justify-content: center;
         }
 
-        .upload-icon svg {
-            width: 28px;
-            height: 28px;
-            color: var(--primary);
-        }
+        .upload-icon svg { width: 28px; height: 28px; color: var(--primary); }
+        .upload-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .upload-hint { font-size: 0.875rem; color: var(--text-secondary); }
 
-        .upload-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .upload-hint {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        /* File Info */
         .file-info {
             display: flex;
             align-items: center;
@@ -384,55 +266,16 @@
             color: white;
         }
 
-        .file-details {
-            flex: 1;
-        }
+        .file-name { font-weight: 600; font-size: 0.9375rem; }
+        .file-size { font-size: 0.8125rem; color: var(--text-secondary); }
 
-        .file-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.9375rem;
-        }
-
-        .file-size {
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            margin: 1.5rem 0;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: var(--border);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
+        .progress-container { margin: 1.5rem 0; }
+        .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--primary), var(--success));
             border-radius: 3px;
             transition: width 0.5s ease;
-            position: relative;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 1.5s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
         }
 
         .progress-text {
@@ -443,7 +286,6 @@
             color: var(--text-secondary);
         }
 
-        /* Content Area */
         .content-area {
             background: var(--bg-primary);
             border: 1px solid var(--border);
@@ -456,17 +298,6 @@
             white-space: pre-wrap;
         }
 
-        .content-area.editable {
-            background: var(--bg-card);
-            min-height: 300px;
-        }
-
-        .content-area:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 0.25rem;
@@ -486,20 +317,10 @@
             font-weight: 500;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
-        .tab:hover {
-            color: var(--text-primary);
-        }
+        .tab.active { background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow-sm); }
 
-        .tab.active {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* Diagrams Grid */
         .diagrams-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -514,12 +335,7 @@
             text-align: center;
         }
 
-        .diagram-label {
-            font-size: 0.8125rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 0.75rem;
-        }
+        .diagram-label { font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 0.75rem; }
 
         .diagram-preview {
             background: var(--bg-card);
@@ -531,19 +347,12 @@
             justify-content: center;
             margin-bottom: 1rem;
             border: 1px solid var(--border);
+            overflow: hidden;
         }
 
-        .diagram-preview svg {
-            max-width: 100%;
-            max-height: 160px;
-        }
+        .diagram-preview svg { max-width: 100%; max-height: 200px; }
+        .placeholder-text { color: var(--text-muted); font-size: 0.875rem; }
 
-        .placeholder-text {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-
-        /* Export Options */
         .export-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -560,10 +369,7 @@
             transition: all 0.2s ease;
         }
 
-        .export-option:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
+        .export-option:hover { border-color: var(--primary); background: var(--primary-light); }
 
         .export-icon {
             width: 48px;
@@ -577,18 +383,9 @@
             color: var(--primary);
         }
 
-        .export-title {
-            font-weight: 600;
-            font-size: 0.9375rem;
-            margin-bottom: 0.25rem;
-        }
+        .export-title { font-weight: 600; font-size: 0.9375rem; margin-bottom: 0.25rem; }
+        .export-desc { font-size: 0.75rem; color: var(--text-secondary); }
 
-        .export-desc {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        /* Status Messages */
         .status-message {
             display: flex;
             align-items: center;
@@ -596,25 +393,12 @@
             padding: 1rem 1.25rem;
             border-radius: var(--radius-sm);
             margin: 1rem 0;
-            font-size: 0.9375rem;
         }
 
-        .status-info {
-            background: var(--primary-light);
-            color: var(--primary-dark);
-        }
+        .status-info { background: var(--primary-light); color: var(--primary-dark); }
+        .status-success { background: var(--success-light); color: #047857; }
+        .status-error { background: #FEF2F2; color: var(--danger); }
 
-        .status-success {
-            background: var(--success-light);
-            color: #047857;
-        }
-
-        .status-error {
-            background: #FEF2F2;
-            color: var(--danger);
-        }
-
-        /* Spinner */
         .spinner {
             width: 18px;
             height: 18px;
@@ -624,69 +408,38 @@
             animation: spin 0.8s linear infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Hidden */
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
 
-        /* Responsive */
         @media (max-width: 768px) {
-            .main {
-                padding: 1rem;
-            }
-
-            .card {
-                padding: 1.5rem;
-            }
-
-            .progress-steps {
-                flex-wrap: wrap;
-                gap: 0.5rem;
-            }
-
-            .step-connector {
-                display: none;
-            }
-
-            .header {
-                padding: 1rem;
-            }
+            .main { padding: 1rem; }
+            .card { padding: 1.5rem; }
+            .step-connector { display: none; }
         }
 
-        /* Article Preview Styles */
         .article-preview h1 { font-size: 1.5rem; margin-bottom: 1rem; }
         .article-preview h2 { font-size: 1.25rem; margin: 1.5rem 0 0.75rem; color: var(--primary); }
-        .article-preview h3 { font-size: 1.125rem; margin: 1rem 0 0.5rem; }
         .article-preview p { margin-bottom: 0.75rem; }
-        .article-preview strong { color: var(--text-primary); }
         .article-preview ul, .article-preview ol { margin: 0.5rem 0 0.5rem 1.5rem; }
-        .article-preview li { margin-bottom: 0.25rem; }
         .article-preview hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="header-inner">
             <a href="#" class="logo">
                 <div class="logo-icon">GR</div>
                 <span>Go-River 記事生成</span>
             </a>
-            <div class="header-actions">
-                <div class="api-status disconnected" id="apiStatus">
-                    <span class="status-dot"></span>
-                    <span id="apiStatusText">未接続</span>
-                </div>
+            <div class="api-status disconnected" id="apiStatus">
+                <span class="status-dot"></span>
+                <span id="apiStatusText">未接続</span>
             </div>
         </div>
     </header>
 
     <main class="main">
-        <!-- Progress Steps -->
         <div class="progress-steps">
             <div class="step-item active" id="stepIndicator0">
                 <span class="step-number">1</span>
@@ -718,16 +471,14 @@
         <div class="card" id="step0">
             <div class="card-header">
                 <h2 class="card-title">API設定</h2>
-                <p class="card-subtitle">Gemini APIキーを入力してください（全機能に使用）</p>
+                <p class="card-subtitle">Gemini APIキーを入力してください</p>
             </div>
             <div class="form-group">
                 <label class="form-label">Gemini API Key</label>
                 <input type="password" class="form-input" id="geminiKey" placeholder="AIzaSy...">
-                <p class="form-hint">Google AI Studio（https://aistudio.google.com/）で取得できます</p>
+                <p class="form-hint">Google AI Studio（https://aistudio.google.com/）で取得</p>
             </div>
-            <button class="btn btn-primary" onclick="saveApiKey()">
-                設定を保存して開始
-            </button>
+            <button class="btn btn-primary" onclick="saveApiKey()">設定を保存して開始</button>
         </div>
 
         <!-- Step 1: Upload -->
@@ -752,15 +503,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                     </svg>
                 </div>
-                <div class="file-details">
+                <div>
                     <div class="file-name" id="fileName"></div>
                     <div class="file-size" id="fileSize"></div>
                 </div>
             </div>
             <div class="btn-group" style="margin-top: 1.5rem;">
-                <button class="btn btn-primary" id="btnTranscribe" disabled onclick="startTranscription()">
-                    文字起こしを開始
-                </button>
+                <button class="btn btn-primary" id="btnTranscribe" disabled onclick="startTranscription()">文字起こしを開始</button>
             </div>
         </div>
 
@@ -768,22 +517,20 @@
         <div class="card hidden" id="step2">
             <div class="card-header">
                 <h2 class="card-title">文字起こし結果</h2>
-                <p class="card-subtitle">話者を分離して文字起こしを実行</p>
+                <p class="card-subtitle">話者を分離して文字起こし</p>
             </div>
             <div class="progress-container hidden" id="transcriptionProgress">
                 <div class="progress-bar">
                     <div class="progress-fill" id="transcriptionFill" style="width: 0%"></div>
                 </div>
                 <div class="progress-text">
-                    <span>音声を解析中...</span>
+                    <span id="transcriptionStatus">音声を解析中...</span>
                     <span id="transcriptionPercent">0%</span>
                 </div>
             </div>
             <div class="content-area" id="transcriptionResult"></div>
             <div class="btn-group" style="margin-top: 1.5rem;">
-                <button class="btn btn-primary" id="btnGenerateArticle" disabled onclick="generateArticle()">
-                    記事を生成
-                </button>
+                <button class="btn btn-primary" id="btnGenerateArticle" disabled onclick="generateArticle()">記事を生成</button>
             </div>
         </div>
 
@@ -807,14 +554,10 @@
                 <button class="tab" onclick="switchTab('markdown')">Markdown</button>
             </div>
             <div id="articlePreview" class="content-area article-preview"></div>
-            <div id="articleMarkdown" class="content-area editable hidden" contenteditable="true"></div>
+            <div id="articleMarkdown" class="content-area hidden" contenteditable="true"></div>
             <div class="btn-group" style="margin-top: 1.5rem;">
-                <button class="btn btn-primary" id="btnGenerateDiagrams" disabled onclick="generateDiagrams()">
-                    図解を生成
-                </button>
-                <button class="btn btn-secondary" onclick="skipToExport()">
-                    図解をスキップ
-                </button>
+                <button class="btn btn-primary" id="btnGenerateDiagrams" disabled onclick="generateDiagrams()">図解を生成</button>
+                <button class="btn btn-secondary" onclick="skipToExport()">図解をスキップ</button>
             </div>
         </div>
 
@@ -830,9 +573,7 @@
             </div>
             <div class="diagrams-grid" id="diagramsGrid"></div>
             <div class="btn-group" style="margin-top: 1.5rem;">
-                <button class="btn btn-success" id="btnExport" disabled onclick="showExport()">
-                    エクスポートへ進む
-                </button>
+                <button class="btn btn-success" id="btnExport" disabled onclick="showExport()">エクスポートへ進む</button>
             </div>
         </div>
 
@@ -882,6 +623,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
+        // Gemini API URL
+        const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+
         // State
         let state = {
             audioFile: null,
@@ -903,42 +647,26 @@
                 updateStepIndicator(1);
             }
 
-            // Drag and drop
             const uploadArea = document.getElementById('uploadArea');
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
+            uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
             uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
                 uploadArea.classList.remove('dragover');
-                if (e.dataTransfer.files.length) {
-                    handleFile(e.dataTransfer.files[0]);
-                }
+                if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
             });
         });
 
         function updateApiStatus(connected) {
             const status = document.getElementById('apiStatus');
             const text = document.getElementById('apiStatusText');
-            if (connected) {
-                status.classList.remove('disconnected');
-                text.textContent = 'API接続済み';
-            } else {
-                status.classList.add('disconnected');
-                text.textContent = '未接続';
-            }
+            status.classList.toggle('disconnected', !connected);
+            text.textContent = connected ? 'API接続済み' : '未接続';
         }
 
         function saveApiKey() {
             const key = document.getElementById('geminiKey').value.trim();
-            if (!key) {
-                alert('APIキーを入力してください');
-                return;
-            }
+            if (!key) { alert('APIキーを入力してください'); return; }
             state.apiKey = key;
             localStorage.setItem('goriver-gemini-key', key);
             updateApiStatus(true);
@@ -949,57 +677,33 @@
         function showStep(stepNum) {
             for (let i = 0; i <= 5; i++) {
                 const step = document.getElementById(`step${i}`);
-                if (step) {
-                    if (i <= stepNum) {
-                        step.classList.remove('hidden');
-                    }
-                }
+                if (step && i <= stepNum) step.classList.remove('hidden');
             }
         }
 
-        function updateStepIndicator(currentStep) {
+        function updateStepIndicator(current) {
             for (let i = 0; i <= 4; i++) {
                 const indicator = document.getElementById(`stepIndicator${i}`);
                 const connector = document.getElementById(`connector${i + 1}`);
-
-                if (i < currentStep) {
-                    indicator.classList.remove('active');
-                    indicator.classList.add('completed');
-                    if (connector) connector.classList.add('active');
-                } else if (i === currentStep) {
-                    indicator.classList.add('active');
-                    indicator.classList.remove('completed');
-                } else {
-                    indicator.classList.remove('active', 'completed');
-                    if (connector) connector.classList.remove('active');
-                }
+                indicator.classList.toggle('completed', i < current);
+                indicator.classList.toggle('active', i === current);
+                if (connector) connector.classList.toggle('active', i < current);
             }
         }
 
         function handleFileSelect(event) {
-            if (event.target.files.length) {
-                handleFile(event.target.files[0]);
-            }
+            if (event.target.files.length) handleFile(event.target.files[0]);
         }
 
         function handleFile(file) {
-            const validTypes = ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/webm', 'audio/ogg', 'audio/x-m4a'];
-            if (!validTypes.includes(file.type) && !file.name.match(/\.(mp3|m4a|wav|webm|ogg)$/i)) {
-                alert('対応していないファイル形式です');
-                return;
-            }
-
             state.audioFile = file;
-
             document.getElementById('fileName').textContent = file.name;
             document.getElementById('fileSize').textContent = formatFileSize(file.size);
             document.getElementById('fileInfo').classList.remove('hidden');
             document.getElementById('btnTranscribe').disabled = false;
 
             const reader = new FileReader();
-            reader.onload = (e) => {
-                state.audioBase64 = e.target.result.split(',')[1];
-            };
+            reader.onload = (e) => { state.audioBase64 = e.target.result.split(',')[1]; };
             reader.readAsDataURL(file);
         }
 
@@ -1009,45 +713,77 @@
             return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
         }
 
+        // 直接Gemini APIを呼び出す（タイムアウト回避）
+        async function callGeminiAPI(prompt, audioData = null, mimeType = null) {
+            const parts = [{ text: prompt }];
+            if (audioData && mimeType) {
+                parts.push({ inline_data: { mime_type: mimeType, data: audioData } });
+            }
+
+            const response = await fetch(`${GEMINI_API_URL}?key=${state.apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts }],
+                    generationConfig: { temperature: 0.5, maxOutputTokens: 8192 }
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'API Error');
+            }
+
+            const data = await response.json();
+            return data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+        }
+
         async function startTranscription() {
             showStep(2);
             updateStepIndicator(2);
             document.getElementById('btnTranscribe').disabled = true;
             document.getElementById('transcriptionProgress').classList.remove('hidden');
 
+            const statusEl = document.getElementById('transcriptionStatus');
+            const fillEl = document.getElementById('transcriptionFill');
+            const percentEl = document.getElementById('transcriptionPercent');
+
             let progress = 0;
             const progressInterval = setInterval(() => {
-                progress = Math.min(progress + Math.random() * 15, 90);
-                document.getElementById('transcriptionFill').style.width = progress + '%';
-                document.getElementById('transcriptionPercent').textContent = Math.round(progress) + '%';
-            }, 500);
+                progress = Math.min(progress + Math.random() * 5, 90);
+                fillEl.style.width = progress + '%';
+                percentEl.textContent = Math.round(progress) + '%';
+            }, 1000);
 
             try {
-                const response = await fetch('/.netlify/functions/transcribe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        audio: state.audioBase64,
-                        mimeType: state.audioFile.type || 'audio/mp4',
-                        apiKey: state.apiKey
-                    })
-                });
+                statusEl.textContent = '音声をアップロード中...';
+
+                const prompt = `添付した音声は、合同会社Go-Riverの行川（なめかわ）さんと竹田（たけだ）さんの対談音声です。
+話者を分けて文字起こししてください。
+文字起こしした内容で違和感のある点は、意味が通るように修正してください。
+
+出力形式:
+- 話者名: 発言内容
+の形式で出力してください。`;
+
+                statusEl.textContent = 'AIが音声を解析中...（1-2分かかります）';
+
+                const result = await callGeminiAPI(prompt, state.audioBase64, state.audioFile.type || 'audio/mp4');
 
                 clearInterval(progressInterval);
-                document.getElementById('transcriptionFill').style.width = '100%';
-                document.getElementById('transcriptionPercent').textContent = '100%';
+                fillEl.style.width = '100%';
+                percentEl.textContent = '100%';
 
-                const data = await response.json();
-                if (data.error) throw new Error(data.error);
-
-                state.transcription = data.transcription;
-                document.getElementById('transcriptionResult').textContent = state.transcription;
+                state.transcription = result;
+                document.getElementById('transcriptionResult').textContent = result;
                 document.getElementById('btnGenerateArticle').disabled = false;
+                statusEl.textContent = '完了！';
 
             } catch (error) {
                 clearInterval(progressInterval);
                 alert('エラー: ' + error.message);
                 document.getElementById('btnTranscribe').disabled = false;
+                statusEl.textContent = 'エラーが発生しました';
             }
         }
 
@@ -1057,33 +793,57 @@
             document.getElementById('btnGenerateArticle').disabled = true;
             document.getElementById('articleProgress').classList.remove('hidden');
 
+            const fillEl = document.getElementById('articleFill');
+            const percentEl = document.getElementById('articlePercent');
+
             let progress = 0;
             const progressInterval = setInterval(() => {
                 progress = Math.min(progress + Math.random() * 10, 90);
-                document.getElementById('articleFill').style.width = progress + '%';
-                document.getElementById('articlePercent').textContent = Math.round(progress) + '%';
+                fillEl.style.width = progress + '%';
+                percentEl.textContent = Math.round(progress) + '%';
             }, 500);
 
             try {
-                const response = await fetch('/.netlify/functions/article', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        transcription: state.transcription,
-                        apiKey: state.apiKey
-                    })
-                });
+                const prompt = `以下の文字起こしをもとに、noteの記事を執筆してください。
+
+## 記事の方針
+- 読者が楽しく読めるよう、わかりやすくて臨場感のある記事にしてください
+- 冗長な部分は思い切ってカットしてください
+- 適切な見出し（##, ###）を付けて読みやすくしてください
+
+## 導入文について【重要】
+- 記事冒頭には必ず合同会社Go-Riverの紹介を含めてください
+- 例：「マーケティングを軸に戦略実行の両面でクライアントを支援する合同会社Go-River。このnoteでは、代表の行川と司会進行の竹田が、仕事や生活における考えを対話形式で深掘りしていきます。」
+
+## 対話形式について
+- 「**行川さん：**」「**竹田さん：**」の形式で会話を表現してください
+- 話し言葉の自然さは残してください
+
+## 図解指示について【重要】
+- 視覚的に表現した方がわかりやすい箇所には「**＞＞図解＜＜**」と注意書きを入れてください
+- 図解マーカーの後には、箇条書きで図解の内容案を記載してください
+- 目安として、記事内に3〜4箇所程度
+
+## CTA（記事末尾）
+---
+**Go-River について**
+[記事のテーマに関連したGo-Riverの強みを1-2文で記載]
+https://go-river.co.jp/
+
+---
+以下が文字起こしの内容です：
+
+${state.transcription}`;
+
+                const result = await callGeminiAPI(prompt);
 
                 clearInterval(progressInterval);
-                document.getElementById('articleFill').style.width = '100%';
-                document.getElementById('articlePercent').textContent = '100%';
+                fillEl.style.width = '100%';
+                percentEl.textContent = '100%';
 
-                const data = await response.json();
-                if (data.error) throw new Error(data.error);
-
-                state.article = data.article;
-                document.getElementById('articleMarkdown').textContent = state.article;
-                document.getElementById('articlePreview').innerHTML = marked.parse(state.article);
+                state.article = result;
+                document.getElementById('articleMarkdown').textContent = result;
+                document.getElementById('articlePreview').innerHTML = marked.parse(result);
                 document.getElementById('btnGenerateDiagrams').disabled = false;
 
             } catch (error) {
@@ -1096,14 +856,8 @@
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
-
-            if (tab === 'preview') {
-                document.getElementById('articlePreview').classList.remove('hidden');
-                document.getElementById('articleMarkdown').classList.add('hidden');
-            } else {
-                document.getElementById('articlePreview').classList.add('hidden');
-                document.getElementById('articleMarkdown').classList.remove('hidden');
-            }
+            document.getElementById('articlePreview').classList.toggle('hidden', tab !== 'preview');
+            document.getElementById('articleMarkdown').classList.toggle('hidden', tab === 'preview');
         }
 
         async function generateDiagrams() {
@@ -1128,28 +882,39 @@
                 card.className = 'diagram-card';
                 card.innerHTML = `
                     <div class="diagram-label">図解 ${i + 1}</div>
-                    <div class="diagram-preview" id="diagram-${i}">
-                        <span class="placeholder-text">生成中...</span>
-                    </div>
-                    <button class="btn btn-secondary" style="width:100%" onclick="downloadSingleDiagram(${i})">ダウンロード</button>
+                    <div class="diagram-preview" id="diagram-${i}"><span class="placeholder-text">生成中...</span></div>
+                    <button class="btn btn-secondary" style="width:100%;margin-top:0.5rem" onclick="downloadSingleDiagram(${i})">ダウンロード</button>
                 `;
                 grid.appendChild(card);
 
                 try {
-                    const response = await fetch('/.netlify/functions/diagram', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            content: diagramMatches[i],
-                            apiKey: state.apiKey
-                        })
-                    });
+                    const prompt = `あなたはSVG図解の専門家です。以下の内容をSVGで図解してください。
 
-                    const data = await response.json();
-                    if (data.svg) {
-                        document.getElementById(`diagram-${i}`).innerHTML = data.svg;
-                        state.diagrams.push({ index: i, svg: data.svg });
-                    }
+【図解内容】
+${diagramMatches[i]}
+
+【SVG作成ルール】
+- サイズ: width="800" height="450"
+- フォント: font-family="Noto Sans JP, sans-serif"
+- 色: 青=#2563eb、緑=#10b981、グレー=#6b7280
+- 背景: #f8fafc
+- カード形式で整理
+
+【重要】
+- マークダウンのコードブロックは使わない
+- <svg>タグから直接始めて</svg>で終わる
+- 日本語テキストをそのまま含める
+
+SVGコード:`;
+
+                    let svg = await callGeminiAPI(prompt);
+                    svg = svg.replace(/```svg\s*/gi, '').replace(/```\s*/gi, '').trim();
+                    const svgMatch = svg.match(/<svg[\s\S]*<\/svg>/i);
+                    if (svgMatch) svg = svgMatch[0];
+
+                    document.getElementById(`diagram-${i}`).innerHTML = svg;
+                    state.diagrams.push({ index: i, svg });
+
                 } catch (error) {
                     document.getElementById(`diagram-${i}`).innerHTML = '<span class="placeholder-text">生成失敗</span>';
                 }
@@ -1163,33 +928,21 @@
             showStep(4);
             showStep(5);
             updateStepIndicator(4);
-            document.getElementById('step4').innerHTML = `
-                <div class="card-header">
-                    <h2 class="card-title">図解生成</h2>
-                    <p class="card-subtitle">スキップしました</p>
-                </div>
-            `;
+            document.getElementById('step4').innerHTML = '<div class="card-header"><h2 class="card-title">図解生成</h2><p class="card-subtitle">スキップしました</p></div>';
         }
 
-        function showExport() {
-            showStep(5);
-            updateStepIndicator(4);
-        }
+        function showExport() { showStep(5); }
 
         function copyToClipboard() {
-            navigator.clipboard.writeText(state.article).then(() => {
-                showExportSuccess('クリップボードにコピーしました');
-            });
+            navigator.clipboard.writeText(state.article).then(() => showExportSuccess('クリップボードにコピーしました'));
         }
 
         function exportMarkdown() {
             const blob = new Blob([state.article], { type: 'text/markdown' });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
+            a.href = URL.createObjectURL(blob);
             a.download = 'article.md';
             a.click();
-            URL.revokeObjectURL(url);
             showExportSuccess('Markdownをダウンロードしました');
         }
 
@@ -1197,19 +950,15 @@
             const diagram = state.diagrams.find(d => d.index === index);
             if (diagram) {
                 const blob = new Blob([diagram.svg], { type: 'image/svg+xml' });
-                const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = url;
+                a.href = URL.createObjectURL(blob);
                 a.download = `diagram-${index + 1}.svg`;
                 a.click();
-                URL.revokeObjectURL(url);
             }
         }
 
         function downloadDiagrams() {
-            state.diagrams.forEach((d, i) => {
-                setTimeout(() => downloadSingleDiagram(d.index), i * 300);
-            });
+            state.diagrams.forEach((d, i) => setTimeout(() => downloadSingleDiagram(d.index), i * 300));
             showExportSuccess('図解をダウンロード中...');
         }
 
