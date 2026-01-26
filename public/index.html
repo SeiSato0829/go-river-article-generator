@@ -1026,23 +1026,38 @@ SVGコード:`;
             // 記事と図解を一体化したHTMLファイルを生成
             let articleContent = state.article;
 
-            // 図解マーカーをSVGで置換
+            // 図解マーカーをプレースホルダーに置換（SVGはMarkdown処理後に挿入）
+            const diagramPlaceholders = [];
             if (state.diagrams.length > 0) {
                 const diagramPattern = /\*\*＞＞図解＜＜\*\*[\s\S]*?(?=\n\n|\n##|$)/g;
                 let diagramIndex = 0;
 
                 articleContent = articleContent.replace(diagramPattern, () => {
                     const diagram = state.diagrams.find(d => d.index === diagramIndex);
-                    diagramIndex++;
+                    const placeholder = `___DIAGRAM_PLACEHOLDER_${diagramIndex}___`;
                     if (diagram) {
-                        return `\n\n<div class="diagram-container">${diagram.svg}</div>\n\n`;
+                        diagramPlaceholders.push({ placeholder, svg: diagram.svg });
                     }
-                    return '';
+                    diagramIndex++;
+                    return `\n\n${placeholder}\n\n`;
                 });
             }
 
-            // MarkdownをHTMLに変換
-            const articleHTML = marked.parse(articleContent);
+            // MarkdownをHTMLに変換（SVGはまだ含まれていない）
+            let articleHTML = marked.parse(articleContent);
+
+            // プレースホルダーを実際のSVGで置換（Markdown処理後）
+            diagramPlaceholders.forEach(({ placeholder, svg }) => {
+                articleHTML = articleHTML.replace(
+                    new RegExp(`<p>${placeholder}</p>`, 'g'),
+                    `<div class="diagram-container">${svg}</div>`
+                );
+                // pタグで囲まれていない場合も対応
+                articleHTML = articleHTML.replace(
+                    new RegExp(placeholder, 'g'),
+                    `<div class="diagram-container">${svg}</div>`
+                );
+            });
 
             // 完全なHTMLドキュメントを生成
             const fullHTML = `<!DOCTYPE html>
