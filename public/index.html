@@ -1114,47 +1114,24 @@ https://go-river.co.jp/`,
             return data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
         }
 
-        // Replicate API call for Nanobanana Pro
+        // Replicate API call via Netlify Function (to avoid CORS)
         async function callReplicateAPI(prompt) {
-            // Create prediction
-            const createResponse = await fetch(REPLICATE_API_URL, {
+            const response = await fetch('/.netlify/functions/image', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${state.replicateKey}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    version: "google/nano-banana-pro",
-                    input: {
-                        prompt: prompt,
-                        aspect_ratio: "16:9",
-                        output_format: "png"
-                    }
+                    prompt: prompt,
+                    apiKey: state.replicateKey
                 })
             });
 
-            if (!createResponse.ok) {
-                const error = await createResponse.json();
-                throw new Error(error.detail || 'Replicate API Error');
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Image generation failed');
             }
 
-            const prediction = await createResponse.json();
-
-            // Poll for completion
-            let result = prediction;
-            while (result.status !== 'succeeded' && result.status !== 'failed') {
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                const pollResponse = await fetch(result.urls.get, {
-                    headers: { 'Authorization': `Bearer ${state.replicateKey}` }
-                });
-                result = await pollResponse.json();
-            }
-
-            if (result.status === 'failed') {
-                throw new Error(result.error || 'Image generation failed');
-            }
-
-            return result.output;
+            const data = await response.json();
+            return data.url;
         }
 
         // Main auto-generation function
