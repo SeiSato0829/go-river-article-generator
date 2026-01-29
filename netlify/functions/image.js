@@ -1,4 +1,4 @@
-// 画像生成API - Pollinations AI（完全無料・APIキー不要）
+// 画像生成API - Gemini 2.0 Flash（ネイティブ画像生成）
 export async function handler(event) {
   // CORS headers
   const headers = {
@@ -16,7 +16,7 @@ export async function handler(event) {
   }
 
   try {
-    const { prompt } = JSON.parse(event.body);
+    const { prompt, apiKey } = JSON.parse(event.body);
 
     if (!prompt) {
       return {
@@ -26,27 +26,63 @@ export async function handler(event) {
       };
     }
 
-    // Pollinations AI - 完全無料・APIキー不要
-    // URLエンコードしてリクエスト
-    const encodedPrompt = encodeURIComponent(prompt);
-    const width = 1024;
-    const height = 576; // 16:9 aspect ratio
-    const seed = Math.floor(Math.random() * 1000000);
-
-    // Pollinations AIのURL形式
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
-
-    // 画像が生成されるか確認（HEADリクエスト）
-    const checkResponse = await fetch(imageUrl, { method: 'HEAD' });
-
-    if (!checkResponse.ok) {
-      throw new Error('画像生成に失敗しました');
+    if (!apiKey) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'APIキーがありません' })
+      };
     }
+
+    // Gemini 2.0 Flash 画像生成モデル
+    const GEMINI_IMAGE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+
+    const response = await fetch(`${GEMINI_IMAGE_URL}?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }],
+        generationConfig: {
+          responseModalities: ["TEXT", "IMAGE"],
+          temperature: 0.8
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Gemini API error:', errorData);
+      throw new Error(errorData.error?.message || 'Gemini API Error');
+    }
+
+    const data = await response.json();
+
+    // レスポンスから画像データを抽出
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    let imageData = null;
+    let mimeType = 'image/png';
+
+    for (const part of parts) {
+      if (part.inlineData) {
+        imageData = part.inlineData.data;
+        mimeType = part.inlineData.mimeType || 'image/png';
+        break;
+      }
+    }
+
+    if (!imageData) {
+      throw new Error('画像が生成されませんでした');
+    }
+
+    // Base64 Data URLとして返す
+    const dataUrl = `data:${mimeType};base64,${imageData}`;
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ url: imageUrl })
+      body: JSON.stringify({ url: dataUrl })
     };
 
   } catch (error) {

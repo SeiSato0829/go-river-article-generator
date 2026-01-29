@@ -617,18 +617,18 @@
         <div class="card" id="setupCard">
             <div class="card-header">
                 <h2 class="card-title">API設定</h2>
-                <p class="card-subtitle">Gemini APIキーを入力してください（画像生成は無料で利用可能）</p>
+                <p class="card-subtitle">Gemini APIキーを入力してください</p>
             </div>
             <div class="form-group">
                 <label class="form-label">Gemini API Key</label>
                 <input type="password" class="form-input" id="geminiKey" placeholder="AIzaSy...">
-                <p class="form-hint">文字起こし・記事生成用（Google AI Studioで無料取得可能）</p>
+                <p class="form-hint">Google AI Studioで無料取得可能</p>
             </div>
             <div class="status-message status-success" style="margin-bottom: 1rem;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>画像生成はPollinations AI（無料）を使用 - APIキー不要</span>
+                <span>Gemini 2.0 Flash：文字起こし・記事生成・画像生成すべて対応</span>
             </div>
             <button class="btn btn-primary" onclick="saveApiKeys()">設定を保存して開始</button>
         </div>
@@ -851,13 +851,13 @@
                     <div class="form-group">
                         <label class="form-label">Gemini API Key</label>
                         <input type="password" class="form-input" id="settingsGeminiKey" placeholder="AIzaSy...">
-                        <p class="form-hint">文字起こし・記事生成用</p>
+                        <p class="form-hint">文字起こし・記事生成・画像生成すべてに使用</p>
                     </div>
                     <div class="status-message status-success" style="margin-top: 1rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span>画像生成: Pollinations AI（無料・APIキー不要）</span>
+                        <span>Gemini 2.0 Flash: 1つのAPIキーで全機能利用可能</span>
                     </div>
                 </div>
 
@@ -1109,12 +1109,15 @@ https://go-river.co.jp/`,
             return data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
         }
 
-        // Pollinations AI - 完全無料・APIキー不要
+        // Gemini 2.0 Flash 画像生成API
         async function callImageAPI(prompt) {
             const response = await fetch('/.netlify/functions/image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: prompt })
+                body: JSON.stringify({
+                    prompt: prompt,
+                    apiKey: state.geminiKey
+                })
             });
 
             if (!response.ok) {
@@ -1203,10 +1206,18 @@ https://go-river.co.jp/`,
                 document.getElementById('progressStatus').textContent = 'アイキャッチ画像生成中...';
 
                 try {
-                    const titleForImage = state.titles[0] || '対談記事';
-                    const eyecatchPrompt = `Professional business article header image for: "${titleForImage}"
+                    // シンプルな英語プロンプトで画像生成
+                    const eyecatchPrompt = `Generate a professional business header image.
 
-Style: Clean, modern, corporate design with gradient blue (#0066FF) to teal (#00C48C) background. Abstract geometric shapes, professional atmosphere. NO text, NO letters, NO words. Suitable for marketing/consulting company content. High quality, sophisticated.`;
+Requirements:
+- Modern, clean corporate design
+- Gradient background from blue (#0066FF) to teal (#00C48C)
+- Abstract geometric shapes and patterns
+- Professional business atmosphere
+- NO text, NO letters, NO words in the image
+- Suitable for marketing and consulting company
+- High quality, sophisticated look
+- 16:9 aspect ratio`;
 
                     const eyecatchUrl = await callImageAPI(eyecatchPrompt);
                     state.eyecatch = eyecatchUrl;
@@ -1224,17 +1235,37 @@ Style: Clean, modern, corporate design with gradient blue (#0066FF) to teal (#00
                 const diagramMatches = state.article.match(/\*\*＞＞図解＜＜\*\*[\s\S]*?(?=\n\n|$)/g) || [];
                 state.diagrams = [];
 
-                for (let i = 0; i < diagramMatches.length; i++) {
+                // 図解のテーマを抽出して英語プロンプトを生成
+                const diagramThemes = [
+                    'Benefits and advantages diagram with icons showing: project progress, trust building, self improvement, opportunity retention',
+                    'Job roles importance matrix showing: high priority roles (Director, PM, Sales) vs specialized roles (Engineer, Analyst, Designer)',
+                    'Communication barriers and solutions: obstacles on left side vs solutions on right side with arrows',
+                    'Customer-first mindset flowchart showing feedback loop and relationship building'
+                ];
+
+                for (let i = 0; i < Math.min(diagramMatches.length, 4); i++) {
                     try {
-                        const diagramContent = diagramMatches[i];
-                        const diagramPrompt = `Create an infographic/diagram image for this concept:
+                        const theme = diagramThemes[i] || 'Business concept diagram with icons and arrows';
+                        const diagramPrompt = `Generate a clean business infographic diagram.
 
-${diagramContent}
+Topic: ${theme}
 
-Style: Clean business infographic with blue (#0066FF) and green (#00C48C) accents. White/light gray background. Simple icons, arrows, and boxes showing relationships. Professional corporate style. Text should be minimal and in Japanese if needed. Clear visual hierarchy.`;
+Requirements:
+- Clean white or light gray background
+- Blue (#0066FF) and green (#00C48C) accent colors
+- Simple icons, arrows, and boxes
+- Professional corporate infographic style
+- Clear visual hierarchy
+- Minimal text, use icons instead
+- Easy to understand at a glance`;
 
                         const diagramUrl = await callImageAPI(diagramPrompt);
-                        state.diagrams.push({ index: i, url: diagramUrl, content: diagramContent });
+                        state.diagrams.push({ index: i, url: diagramUrl, content: diagramMatches[i] });
+
+                        // レート制限対策: 画像生成間に少し待機
+                        if (i < diagramMatches.length - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                        }
                     } catch (error) {
                         console.error(`Diagram ${i} error:`, error);
                         state.diagrams.push({ index: i, url: null, content: diagramMatches[i], error: true });
