@@ -617,19 +617,18 @@
         <div class="card" id="setupCard">
             <div class="card-header">
                 <h2 class="card-title">API設定</h2>
-                <p class="card-subtitle">Gemini APIキーとReplicate APIキーを入力してください</p>
+                <p class="card-subtitle">Gemini APIキーを入力してください（画像生成は無料で利用可能）</p>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Gemini API Key</label>
-                    <input type="password" class="form-input" id="geminiKey" placeholder="AIzaSy...">
-                    <p class="form-hint">文字起こし・記事生成用</p>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Replicate API Key</label>
-                    <input type="password" class="form-input" id="replicateKey" placeholder="r8_...">
-                    <p class="form-hint">画像生成用（Nanobanana Pro）</p>
-                </div>
+            <div class="form-group">
+                <label class="form-label">Gemini API Key</label>
+                <input type="password" class="form-input" id="geminiKey" placeholder="AIzaSy...">
+                <p class="form-hint">文字起こし・記事生成用（Google AI Studioで無料取得可能）</p>
+            </div>
+            <div class="status-message status-success" style="margin-bottom: 1rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>画像生成はPollinations AI（無料）を使用 - APIキー不要</span>
             </div>
             <button class="btn btn-primary" onclick="saveApiKeys()">設定を保存して開始</button>
         </div>
@@ -852,10 +851,13 @@
                     <div class="form-group">
                         <label class="form-label">Gemini API Key</label>
                         <input type="password" class="form-input" id="settingsGeminiKey" placeholder="AIzaSy...">
+                        <p class="form-hint">文字起こし・記事生成用</p>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Replicate API Key</label>
-                        <input type="password" class="form-input" id="settingsReplicateKey" placeholder="r8_...">
+                    <div class="status-message status-success" style="margin-top: 1rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>画像生成: Pollinations AI（無料・APIキー不要）</span>
                     </div>
                 </div>
 
@@ -893,7 +895,6 @@
     <script>
         // API URLs
         const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-        const REPLICATE_API_URL = 'https://api.replicate.com/v1/predictions';
 
         // Default prompts
         const DEFAULT_PROMPTS = {
@@ -993,7 +994,6 @@ https://go-river.co.jp/`,
             eyecatch: null,
             diagrams: [],
             geminiKey: '',
-            replicateKey: '',
             currentPreset: 'company',
             prompts: JSON.parse(JSON.stringify(DEFAULT_PROMPTS))
         };
@@ -1014,7 +1014,6 @@ https://go-river.co.jp/`,
 
         function loadSettings() {
             state.geminiKey = localStorage.getItem('goriver-gemini-key') || '';
-            state.replicateKey = localStorage.getItem('goriver-replicate-key') || '';
             state.currentPreset = localStorage.getItem('goriver-preset') || 'company';
 
             const savedPrompts = localStorage.getItem('goriver-prompts');
@@ -1023,9 +1022,8 @@ https://go-river.co.jp/`,
             }
 
             document.getElementById('geminiKey').value = state.geminiKey;
-            document.getElementById('replicateKey').value = state.replicateKey;
 
-            if (state.geminiKey && state.replicateKey) {
+            if (state.geminiKey) {
                 updateApiStatus(true);
                 document.getElementById('setupCard').classList.add('hidden');
                 document.getElementById('mainCard').classList.remove('hidden');
@@ -1036,13 +1034,10 @@ https://go-river.co.jp/`,
 
         function saveApiKeys() {
             state.geminiKey = document.getElementById('geminiKey').value.trim();
-            state.replicateKey = document.getElementById('replicateKey').value.trim();
 
             if (!state.geminiKey) { alert('Gemini APIキーを入力してください'); return; }
-            if (!state.replicateKey) { alert('Replicate APIキーを入力してください'); return; }
 
             localStorage.setItem('goriver-gemini-key', state.geminiKey);
-            localStorage.setItem('goriver-replicate-key', state.replicateKey);
 
             updateApiStatus(true);
             document.getElementById('setupCard').classList.add('hidden');
@@ -1114,15 +1109,12 @@ https://go-river.co.jp/`,
             return data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
         }
 
-        // Replicate API call via Netlify Function (to avoid CORS)
-        async function callReplicateAPI(prompt) {
+        // Pollinations AI - 完全無料・APIキー不要
+        async function callImageAPI(prompt) {
             const response = await fetch('/.netlify/functions/image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    prompt: prompt,
-                    apiKey: state.replicateKey
-                })
+                body: JSON.stringify({ prompt: prompt })
             });
 
             if (!response.ok) {
@@ -1216,7 +1208,7 @@ https://go-river.co.jp/`,
 
 Style: Clean, modern, corporate design with gradient blue (#0066FF) to teal (#00C48C) background. Abstract geometric shapes, professional atmosphere. NO text, NO letters, NO words. Suitable for marketing/consulting company content. High quality, sophisticated.`;
 
-                    const eyecatchUrl = await callReplicateAPI(eyecatchPrompt);
+                    const eyecatchUrl = await callImageAPI(eyecatchPrompt);
                     state.eyecatch = eyecatchUrl;
                     updateProgress('eyecatch', 'completed');
                 } catch (error) {
@@ -1241,7 +1233,7 @@ ${diagramContent}
 
 Style: Clean business infographic with blue (#0066FF) and green (#00C48C) accents. White/light gray background. Simple icons, arrows, and boxes showing relationships. Professional corporate style. Text should be minimal and in Japanese if needed. Clear visual hierarchy.`;
 
-                        const diagramUrl = await callReplicateAPI(diagramPrompt);
+                        const diagramUrl = await callImageAPI(diagramPrompt);
                         state.diagrams.push({ index: i, url: diagramUrl, content: diagramContent });
                     } catch (error) {
                         console.error(`Diagram ${i} error:`, error);
@@ -1584,7 +1576,6 @@ Style: Clean business infographic with blue (#0066FF) and green (#00C48C) accent
         function openSettings() {
             document.getElementById('settingsModal').classList.remove('hidden');
             document.getElementById('settingsGeminiKey').value = state.geminiKey;
-            document.getElementById('settingsReplicateKey').value = state.replicateKey;
             loadPromptSettings();
         }
 
@@ -1621,7 +1612,6 @@ Style: Clean business infographic with blue (#0066FF) and green (#00C48C) accent
 
         function saveSettings() {
             state.geminiKey = document.getElementById('settingsGeminiKey').value.trim();
-            state.replicateKey = document.getElementById('settingsReplicateKey').value.trim();
 
             const preset = document.getElementById('settingsPresetCompany').classList.contains('active') ? 'company' : 'personal';
             state.prompts[preset].article = document.getElementById('promptArticle').value;
@@ -1629,12 +1619,11 @@ Style: Clean business infographic with blue (#0066FF) and green (#00C48C) accent
             state.prompts[preset].summary = document.getElementById('promptSummary').value;
 
             localStorage.setItem('goriver-gemini-key', state.geminiKey);
-            localStorage.setItem('goriver-replicate-key', state.replicateKey);
             localStorage.setItem('goriver-prompts', JSON.stringify(state.prompts));
 
-            updateApiStatus(state.geminiKey && state.replicateKey);
+            updateApiStatus(!!state.geminiKey);
 
-            if (state.geminiKey && state.replicateKey) {
+            if (state.geminiKey) {
                 document.getElementById('setupCard').classList.add('hidden');
                 document.getElementById('mainCard').classList.remove('hidden');
             }

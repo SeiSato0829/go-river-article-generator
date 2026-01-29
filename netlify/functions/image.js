@@ -1,4 +1,4 @@
-// 画像生成API - Replicate (Nanobanana Pro) 経由
+// 画像生成API - Pollinations AI（完全無料・APIキー不要）
 export async function handler(event) {
   // CORS headers
   const headers = {
@@ -16,71 +16,37 @@ export async function handler(event) {
   }
 
   try {
-    const { prompt, apiKey } = JSON.parse(event.body);
+    const { prompt } = JSON.parse(event.body);
 
-    if (!prompt || !apiKey) {
+    if (!prompt) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'プロンプトまたはAPIキーがありません' })
+        body: JSON.stringify({ error: 'プロンプトがありません' })
       };
     }
 
-    // Create prediction using model name format
-    const createResponse = await fetch('https://api.replicate.com/v1/models/google-deepmind/imagen-4/predictions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'wait'
-      },
-      body: JSON.stringify({
-        input: {
-          prompt: prompt,
-          aspect_ratio: "16:9",
-          output_format: "png",
-          safety_filter_level: "block_only_high"
-        }
-      })
-    });
+    // Pollinations AI - 完全無料・APIキー不要
+    // URLエンコードしてリクエスト
+    const encodedPrompt = encodeURIComponent(prompt);
+    const width = 1024;
+    const height = 576; // 16:9 aspect ratio
+    const seed = Math.floor(Math.random() * 1000000);
 
-    if (!createResponse.ok) {
-      const error = await createResponse.json();
-      console.error('Replicate create error:', error);
-      throw new Error(error.detail || 'Replicate API Error');
-    }
+    // Pollinations AIのURL形式
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
 
-    let prediction = await createResponse.json();
+    // 画像が生成されるか確認（HEADリクエスト）
+    const checkResponse = await fetch(imageUrl, { method: 'HEAD' });
 
-    // Poll for completion (max 60 seconds)
-    const maxAttempts = 30;
-    let attempts = 0;
-
-    while (prediction.status !== 'succeeded' && prediction.status !== 'failed' && attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const pollResponse = await fetch(prediction.urls.get, {
-        headers: { 'Authorization': `Bearer ${apiKey}` }
-      });
-      
-      prediction = await pollResponse.json();
-      attempts++;
-    }
-
-    if (prediction.status === 'failed') {
-      throw new Error(prediction.error || 'Image generation failed');
-    }
-
-    if (prediction.status !== 'succeeded') {
-      throw new Error('Image generation timed out');
+    if (!checkResponse.ok) {
+      throw new Error('画像生成に失敗しました');
     }
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ 
-        url: Array.isArray(prediction.output) ? prediction.output[0] : prediction.output 
-      })
+      body: JSON.stringify({ url: imageUrl })
     };
 
   } catch (error) {
